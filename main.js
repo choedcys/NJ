@@ -1,78 +1,69 @@
 var http = require('http');
 var fs = require('fs');
 var urlm = require('url');
-
-var app = http.createServer(function(request, response) { 
-    var url = request.url;
-    var queryData = urlm.parse(url, true).query
-
-    var title = queryData.id
-    console.log(urlm.parse(url, true)); // 1 URL 정보
-    
-    var pathname = urlm.parse(url, true).pathname //2 URL 정보 중 pathname 저장
-    
-    if(pathname == '/'){ // 3 root로 접속했을 경우 
-        fs.readFile(`${queryData.id}`,'utf-8',function(err, description){
-            if(queryData.id === undefined){ // 1 querystring이 없이 undefined이면 홈페이지
-                // 2 함수 fs.readFile은 생략가능
-                fs.readFile(`${queryData.id}`,'utf-8',function(err, description){ // 3 지역변수 title, description 선언
-                var title = 'favicon.ico'
-                var description ='A favicon(short for favorite icon), also known as a shortcut icon, website icon,tab icon, URL icon.'
-            var template = `
-            <!doctype html>
-            <html>
-                <head>
-                    <title>WEB1 - ${title}</title> 
-                    <link rel = "icon" href = "data:,">
-                    <meta charset="utf-8">
-                </head>
-                <body>
-                <h1><a href="/">favicon이란</a></h1>
-                <ol>
-                <li><a href="/?id=HIS.html">History</a></li>
-                <li><a href="/?id=STAN.html">Standardization</a></li>
-                <li><a href="/?id=LEG.html">Legacy</a></li> 
-                </ol>
-                <h2>${title}</h2>
-                <p>${description}</p>
-                </body>
-                </html> ` ; 
-                response.writeHead(200); 
-                response.end(template);
-            });
-        }
-        else
-        {
-            fs.readFile(`${queryData.id}`,'utf-8',function(err, description){
-            var title = queryData.id 
-            var template = ` 
-            <!doctype html>
-            <html>
-                <head>
-                <title>WEB1 - ${title}</title>
-                <link rel = "icon" href = "data:,">
-                <meta charset="utf-8">
-                </head>
-                <body>
-                    <h1><a href="/">favicon이란</a></h1>
-                    <ol>
-                    <li><a href="/?id=HIS.html">History</a></li>
-                    <li><a href="/?id=STAN.html">Standardization</a></li>
-                    <li><a href="/?id=LEG.html">Legacy</a></li> 
-                    </ol>
-                    <h2>${title}</h2>
-                    <p>${description}</p>
-                </body>
-            </html> `  ;
-            response.writeHead(200); 
-            response.end(template);
-            });
-        }
-        });
-    }
-    else{
-        response.writeHead(404);
-        response.end('Not found');
-    }
-}); 
-app.listen(3000);
+var app = http.createServer(function(request, response) {
+var url = request.url;
+var queryData = urlm.parse(url, true).query; // 9 parse 메소드의 두번째 인자 : true - object형으로 반환, false – string 반환 
+var pathname = urlm.parse(url, true).pathname;
+    if(pathname === '/') {
+            if(queryData.id === undefined) {
+                fs.readdir('./data', function(error, filelist) {
+                    var title = 'Welcome';
+                    var description ='Hello Nodejs'
+                    var list = '<ul>';
+                    var i = 0;
+                    while(i < filelist.length){
+                        list = list + `<li><a href = "/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+                        i = i+1;
+                    }
+                    list = list+'</ul>';
+                    var template = `
+                    <!doctype html>
+                    <html>
+                    <head>
+                        <title>WEB1 - ${title}</title> 
+                        <link rel = "icon" href = "data:,">
+                        <meta charset="utf-8">
+                    </head>
+                    <body>
+                        <h1><a href="/">WEB</a></h1>
+                        ${list}
+                        <h2>${title}</h2>
+                        <p>${description}</p>
+                    </body>
+                    </html>
+                        `; response.writeHead(200); 
+                        response.end(template);
+                        });
+                    } else {
+                        fs.readdir('./data', function(error, filelist) {
+                                var list = '<ul>';
+                                var i = 0;
+                                while(i < filelist.length) {
+                                    list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+                                    i = i + 1; 
+                                }
+                        list = list+'</ul>';
+                        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+                                    var title = queryData.id;
+                                    var template = `
+                                    <!doctype html>
+                                    <html>
+                                        <head>
+                                            <title>WEB1 - ${title}</title>
+                                            <meta charset="utf-8">
+                                        </head> 
+                                        <body>
+                                            <h1><a href="/">WEB</a></h1>
+                                            ${list}
+                                            <h2>${title}</h2>
+                                            <p>${description}</p>
+                                        </body>
+                                    </html>
+                        `; response.writeHead(200); response.end(template);
+                        }); 
+                    });
+                        }
+                        } else { response.writeHead(404); response.end('Not found');
+                        } });
+                        app.listen(3000);
