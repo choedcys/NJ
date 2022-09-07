@@ -1,3 +1,36 @@
+function templateHTML(title, list, body){
+    return `
+    <!doctype html>
+    <html>
+    <head>
+    <title>WEB1 - ${title}</title> 
+    <meta charset="utf-8">
+    </head>
+    <body>
+        <h1><a href="/">1년 어쩌구저쩌구하는 거</a></h1>
+            ${list}
+            ${body} 
+    </body>
+    </html>
+`;
+}
+function Tlist(filelist){
+    var list = '<ul>';
+    var i = 0;
+    while(i < filelist.length){
+        list = list + `<li><a href = "/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+        i = i+1;
+    }
+    list = list+'</ul>';
+    return list;
+}
+function click(){
+    var list = Tlist(filelist);
+    var template = templateHTML(title,list,`<h2>${title}</h2><p>${description}</p>`);
+    response.writeHead(200); 
+    response.end(template);
+}
+
 var http = require('http');
 var fs = require('fs');
 var urlm = require('url');
@@ -10,61 +43,22 @@ var pathname = urlm.parse(url, true).pathname;
                 fs.readdir('./data', function(error, filelist) {
                     var title = '월별 계획';
                     var description ='월을 클릭해 주세요'
-                    var list = '<ul>';
-                    var i = 0;
-                    while(i < filelist.length){
-                        list = list + `<li><a href = "/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-                        i = i+1;
-                    }
-                    list = list+'</ul>';
-                    var template = `
-                    <!doctype html>
-                    <html>
-                    <head>
-                        <title>WEB1 - ${title}</title> 
-                        <link rel = "icon" href = "data:,">
-                        <meta charset="utf-8">
-                    </head>
-                    <body>
-                        <h1><a href="/">1년 연중 일정 및 계획</a></h1>
-                        ${list}
-                        <h2>${title}</h2>
-                        <p>${description}</p>
-                    </body>
-                    </html>
-                        `; response.writeHead(200); 
-                        response.end(template);
-                        });
-                    } else 
-                        {
-                        fs.readdir('./data', function(error, filelist) {
-                                var list = '<ul>';
-                                var i = 0;
-                                while(i < filelist.length) {
-                                    list = list + `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-                                    i = i + 1; 
-                                }
-                        list = list+'</ul>';
-                        fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
-                                    var title = queryData.id;
-                                    var template = `
-                                    <!doctype html>
-                                    <html>
-                                        <head>
-                                            <title>WEB1 - ${title}</title>
-                                            <meta charset="utf-8">
-                                        </head> 
-                                        <body>
-                                            <h1><a href="/">1년 연중 일정 및 계획</a></h1>
-                                            ${list}
-                                            <h2>${title}</h2>
-                                            <p>${description}</p>
-                                        </body>
-                                    </html>
-                        `; response.writeHead(200); response.end(template);
-                        }); 
-                    });
-                        }
-                        } else { response.writeHead(404); response.end('Not found');
-                        } });
-                        app.listen(3000);
+                    click();
+                    
+                });
+            } 
+            else {
+                fs.readdir('./data', function(error, filelist) {
+                    var title = queryData.id;
+                    fs.readFile(`data/${queryData.id}`, 'utf8', function(err, description) {
+                        click();
+                    }); 
+                });
+            }
+    } 
+    else { 
+        response.writeHead(404); 
+        response.end('Not found');
+    } 
+});
+app.listen(3000);
