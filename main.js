@@ -8,8 +8,8 @@ var pathname = urlm.parse(url, true).pathname;
     if(pathname === '/') {
             if(queryData.id === undefined) {
                 fs.readdir('./data', function(error, filelist) {
-                    var title = 'Welcome';
-                    var description ='Hello Nodejs'
+                    var title = '월별 계획';
+                    var description ='월을 클릭해 주세요'
                     var list = '<ul>';
                     var i = 0;
                     while(i < filelist.length){
@@ -26,7 +26,7 @@ var pathname = urlm.parse(url, true).pathname;
                         <meta charset="utf-8">
                     </head>
                     <body>
-                        <h1><a href="/">WEB</a></h1>
+                        <h1><a href="/">1년 연중 일정 및 계획</a></h1>
                         ${list}
                         <h2>${title}</h2>
                         <p>${description}</p>
@@ -35,7 +35,8 @@ var pathname = urlm.parse(url, true).pathname;
                         `; response.writeHead(200); 
                         response.end(template);
                         });
-                    } else {
+                    } else 
+                        {
                         fs.readdir('./data', function(error, filelist) {
                                 var list = '<ul>';
                                 var i = 0;
@@ -54,7 +55,7 @@ var pathname = urlm.parse(url, true).pathname;
                                             <meta charset="utf-8">
                                         </head> 
                                         <body>
-                                            <h1><a href="/">WEB</a></h1>
+                                            <h1><a href="/">1년 연중 일정 및 계획</a></h1>
                                             ${list}
                                             <h2>${title}</h2>
                                             <p>${description}</p>
